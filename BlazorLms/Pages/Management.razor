@@ -1,0 +1,142 @@
+﻿@page "/management"
+@inject HttpClient Http
+
+<h1>Maskins</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+@if (maskiner == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+
+    <div class="row">
+        <table class="table table-responsive table-bordered">
+            <tr class="table-primary">
+                <th>Maskins Id</th>
+                <th>Maskinens Namn</th>
+                <th>Status</th>
+                <th>Data</th>
+            </tr>
+            @foreach (Maskin maskin in maskiner)
+                {
+                    <tr>
+                        <td>@maskin.Id</td>
+                        <td>@maskin.Namn</td>
+                        <td>@maskin.MaskinsStatus</td>
+                        <td>Senaste Skickade datat</td>
+                        @*@foreach (var maskindata in listdata.Where(d=>d.MaskinId==maskin.Id))
+                        {
+                        <td>@maskindata.Namn</td>
+
+                        }*@
+                        <td><a href="/Kurser/DownloadFile?filename=">Skicka kommando</a></td>
+                    </tr>
+
+
+                }
+        </table>
+
+    </div>
+}
+
+@code {
+
+    private static Faker fake;
+    private static List<Data> listdata;
+    private static List<Maskin> maskiner;
+
+    protected override async Task OnInitializedAsync()
+    {
+        maskiner =  GetMaskiner();
+        listdata = GetData();
+    }
+
+    public class Maskin
+    {
+        public Guid Id { get; set; }
+
+        public string Namn { get; set; }
+
+        public status MaskinsStatus { get; set; }
+
+        public List<Data> MaskinsData { get; set; }
+
+
+    }
+    public class Data
+    {
+        public Guid Id { get; set; }
+        public string Namn { get; set; }
+        public DateTime SändingsTid { get; set; }
+        public Guid MaskinId { get; set; }
+        public Maskin Maskin { get; set; }
+    }
+    public enum status
+    {
+        Online, Offline
+    }
+
+    private static List<Data> GetData()
+    {
+        listdata = new List<Data>()
+        {
+                new Data
+                {
+
+                    Namn = "Close ",
+                   // SändingsTid = fake.Date.Between(DateTime.Now,DateTime.Now),
+                    Maskin = fake.Random.ListItem<Maskin>(maskiner)
+
+
+                },
+                  new Data
+                {
+                   Namn = "Pause",
+                  // SändingsTid = fake.Date.Between(DateTime.Now,DateTime.Now),
+                   Maskin = fake.Random.ListItem<Maskin>(maskiner)
+
+
+                },
+                new Data
+                {
+                    Namn = "start",
+                    //SändingsTid = fake.Date.Between(DateTime.Now,DateTime.Now),
+                    Maskin = fake.Random.ListItem<Maskin>(maskiner)
+
+                },
+        };
+        return listdata;
+
+    }
+    private static List<Maskin> GetMaskiner()
+    {
+
+        maskiner = new List<Maskin>()
+                {
+                 new Maskin
+                   {
+                    Namn = "Maskin1",
+                    MaskinsStatus= status.Offline,
+                    MaskinsData = listdata
+                    },
+                new Maskin
+                   {
+                    Namn = "Maskin 2",
+                    MaskinsStatus=status.Online,
+                    MaskinsData = listdata
+                    },
+                 new Maskin
+                    {
+                     Namn = "Maskin 3",
+                     MaskinsStatus = status.Online,
+                     MaskinsData = listdata
+                     },
+
+               };
+        return maskiner;
+    }
+
+}
